@@ -53,7 +53,6 @@ if [ ! -f .env ]; then
 # Flask Configuration
 FLASK_ENV=development
 FLASK_APP=run.py
-SECRET_KEY=dev-secret-key-change-in-production-f89a7d6c8b4e3a2d
 
 # Database Configuration (PostgreSQL)
 # Note: Database is managed by centralized infrastructure at ../../infrastructure/data/

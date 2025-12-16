@@ -8,7 +8,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: ${OIDC_ISSUER_URI:http://localhost:8080/realms/fleet-management}
+          issuer-uri: ${OIDC_ISSUER_URI:http://localhost:8080/realms/fleet-management-app}
           # jwk-set-uri will be auto-discovered from issuer-uri
 
   datasource:

@@ -21,7 +21,7 @@ Step 2: Redirect to Keycloak
 User clicks button
          ↓
 NextAuth redirects to:
-http://localhost:8080/realms/fleet-management/protocol/openid-connect/auth
+http://localhost:8080/realms/fleet-management-app/protocol/openid-connect/auth
          ↓
 [Keycloak Login Page]
          ↓
@@ -137,7 +137,7 @@ Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6...
 │  Payload:                                                    │
 │    {                                                         │
 │      "sub": "user-id",                                       │
-│      "iss": "http://localhost:8080/realms/fleet-management", │
+│      "iss": "http://localhost:8080/realms/fleet-management-app", │
 │      "aud": "vehicle-service",                               │
 │      "exp": 1234567890,                                      │
 │      "iat": 1234567890,                                      │
