@@ -25,4 +25,4 @@ spec:
             - name: ConnectionStrings__DefaultConnection
               value: "Host=postgres;Port=5432;Database=vehicle_db;Username=postgres;Password=postgres"
             - name: Authentication__JwtBearer__Authority
-              value: "http://keycloak:8080/realms/fleet-management"
+              value: "http://keycloak:8080/realms/fleet-management-app"
