@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vehicle-service-config
+  namespace: fleet-management
+data:
+  ASPNETCORE_ENVIRONMENT: "Production"
+  ASPNETCORE_URLS: "http://+:8080"
+  CORS_ORIGINS: "*"
+  # Database connection (uses postgres-vehicle service)
+  ConnectionStrings__DefaultConnection: "Host=postgres-vehicle;Port=5432;Database=vehicle_db;Username=postgres;Password=postgres"
+

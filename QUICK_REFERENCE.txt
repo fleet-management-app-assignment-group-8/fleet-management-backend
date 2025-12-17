@@ -1,0 +1,73 @@
+===============================
+FLEET MANAGEMENT - QUICK REFERENCE
+===============================
+
+DOCKER IMAGES
+-------------
+harinejan/vehicle-service:latest
+harinejan/maintenance-service:latest
+harinejan/driver-service:latest
+harinejan/fleet-frontend:latest
+
+BUILD & PUBLISH
+---------------
+cd <service-directory>
+./docker-build.sh      # Builds with git tags
+./docker-publish.sh    # Pushes to Docker Hub
+
+DEPLOY ALL SERVICES
+-------------------
+cd infrastructure/ansible/k8s
+./redeploy-all-services.sh
+
+DEPLOY INDIVIDUAL SERVICE
+--------------------------
+cd <service>/k8s
+./redeploy-service.sh
+
+VERIFY DEPLOYMENT
+-----------------
+kubectl get pods -n fleet-management
+kubectl get svc -n fleet-management
+kubectl logs -f deployment/<service> -n fleet-management
+
+SERVICES & PORTS
+----------------
+vehicle-service:8080
+maintenance-service:5001
+driver-service:8080
+fleet-frontend:3000
+keycloak:8080
+
+DATABASES
+---------
+postgres-vehicle:5432/vehicle_db
+postgres-maintenance:5432/maintenance_db
+postgres-driver:5432/driver_db
+
+ISTIO RESOURCES
+---------------
+kubectl get virtualservices -n fleet-management
+kubectl get destinationrules -n fleet-management
+kubectl get peerauthentication -n fleet-management
+
+MONITORING
+----------
+kubectl get servicemonitor -n fleet-management
+kubectl top pods -n fleet-management
+
+SCALING
+-------
+kubectl scale deployment <service> --replicas=5 -n fleet-management
+kubectl get hpa -n fleet-management
+
+TROUBLESHOOTING
+---------------
+kubectl describe pod <pod> -n fleet-management
+kubectl logs <pod> -n fleet-management
+kubectl get events -n fleet-management
+
+CLEANUP
+-------
+kubectl delete namespace fleet-management
+

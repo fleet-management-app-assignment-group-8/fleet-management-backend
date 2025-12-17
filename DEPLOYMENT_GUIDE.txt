@@ -1,0 +1,379 @@
+===============================
+FLEET MANAGEMENT SYSTEM
+COMPLETE DEPLOYMENT GUIDE
+===============================
+
+OVERVIEW
+--------
+This guide covers deploying all microservices to Kubernetes with Istio service mesh
+and Prometheus monitoring.
+
+SERVICES:
+- Vehicle Service (C# .NET)
+- Maintenance Service (Python Flask)
+- Driver Service (Java Spring Boot)
+- Fleet Frontend (Next.js)
+- PostgreSQL Databases (3 instances)
+- Keycloak (Identity & Access Management)
+
+ARCHITECTURE
+------------
+Namespace: fleet-management
+Service Mesh: Istio
+Monitoring: Prometheus
+Image Registry: Docker Hub (harinejan/*)
+
+PREREQUISITES
+-------------
+1. Kubernetes cluster (v1.24+)
+2. Istio installed (v1.18+)
+3. kubectl configured
+4. Docker Hub account (harinejan)
+5. Prometheus Operator (for ServiceMonitor)
+
+DOCKER IMAGES
+-------------
+All images follow the same naming convention:
+- harinejan/vehicle-service:latest
+- harinejan/maintenance-service:latest
+- harinejan/driver-service:latest
+- harinejan/fleet-frontend:latest
+
+BUILD & PUBLISH WORKFLOW
+------------------------
+
+1. Vehicle Service:
+   cd src/vehicleService
+   ./docker-build.sh
+   ./docker-publish.sh
+
+2. Maintenance Service:
+   cd src/maintenanceService
+   ./docker-build.sh
+   ./docker-publish.sh
+
+3. Driver Service:
+   cd src/DriverService
+   ./docker-build.sh
+   ./docker-publish.sh
+
+4. Frontend:
+   cd fleet-management-app
+   ./docker-build.sh
+   ./docker-publish.sh
+
+KUBERNETES DEPLOYMENT
+---------------------
+
+OPTION 1: Deploy Everything at Once
+------------------------------------
+cd infrastructure/ansible/k8s
+./redeploy-all-services.sh
+
+This will deploy in order:
+1. Namespace (fleet-management)
+2. Databases (postgres-vehicle, postgres-maintenance, postgres-driver)
+3. Keycloak
+4. Vehicle Service
+5. Maintenance Service
+6. Driver Service
+7. Frontend
+
+OPTION 2: Deploy Services Individually
+---------------------------------------
+
+Step 1: Create Namespace
+kubectl apply -f src/vehicleService/k8s/namespace.yaml
+
+Step 2: Deploy Databases
+kubectl apply -f infrastructure/data/k8s/postgres-vehicle.yaml
+kubectl apply -f infrastructure/data/k8s/postgres-maintenance.yaml
+kubectl apply -f infrastructure/data/k8s/postgres-driver.yaml
+
+Step 3: Deploy Keycloak
+kubectl apply -f infrastructure/identity/k8s/keycloak.yaml
+
+Step 4: Deploy Services
+kubectl apply -k src/vehicleService/k8s/
+kubectl apply -k src/maintenanceService/k8s/
+kubectl apply -k src/DriverService/k8s/
+kubectl apply -k fleet-management-app/k8s/
+
+REDEPLOY INDIVIDUAL SERVICES
+-----------------------------
+
+Vehicle Service:
+cd src/vehicleService/k8s
+./redeploy-service.sh
+
+Maintenance Service:
+cd src/maintenanceService/k8s
+./redeploy-service.sh
+
+Driver Service:
+cd src/DriverService/k8s
+./redeploy-service.sh
+
+Frontend:
+cd fleet-management-app/k8s
+./redeploy-service.sh
+
+VERIFICATION
+------------
+
+# Check all pods
+kubectl get pods -n fleet-management
+
+# Check services
+kubectl get svc -n fleet-management
+
+# Check Istio resources
+kubectl get virtualservices,destinationrules -n fleet-management
+
+# Check HPA
+kubectl get hpa -n fleet-management
+
+# View logs
+kubectl logs -f deployment/vehicle-service -n fleet-management
+kubectl logs -f deployment/maintenance-service -n fleet-management
+kubectl logs -f deployment/driver-service -n fleet-management
+kubectl logs -f deployment/fleet-frontend -n fleet-management
+
+ISTIO CONFIGURATION
+-------------------
+
+Each service has:
+- VirtualService: Traffic routing with retries
+- DestinationRule: Load balancing and circuit breaking
+- PeerAuthentication: mTLS (STRICT mode)
+- ServiceMonitor: Prometheus metrics scraping
+
+PROMETHEUS MONITORING
+---------------------
+
+Metrics endpoints:
+- Vehicle Service: /metrics
+- Maintenance Service: /metrics
+- Driver Service: /actuator/prometheus
+- Frontend: /api/metrics
+
+ServiceMonitor resources automatically configure Prometheus to scrape these endpoints.
+
+DATABASE CONNECTIONS
+--------------------
+
+Vehicle Service → postgres-vehicle:5432/vehicle_db
+Maintenance Service → postgres-maintenance:5432/maintenance_db
+Driver Service → postgres-driver:5432/driver_db
+
+All databases use:
+- Username: postgres
+- Password: postgres (change in production!)
+- Persistent storage: 10Gi PVC each
+
+KEYCLOAK CONFIGURATION
+----------------------
+
+Access: http://keycloak:8080
+Admin credentials:
+- Username: admin
+- Password: admin (change in production!)
+
+Realm: fleet-management
+Clients: vehicle-service, maintenance-service, driver-service
+
+SERVICE PORTS
+-------------
+
+Vehicle Service: 8080
+Maintenance Service: 5001
+Driver Service: 8080
+Frontend: 3000
+Keycloak: 8080
+PostgreSQL: 5432
+
+RESOURCE LIMITS
+---------------
+
+Vehicle Service:
+- Requests: 256Mi RAM, 250m CPU
+- Limits: 512Mi RAM, 500m CPU
+
+Maintenance Service:
+- Requests: 256Mi RAM, 250m CPU
+- Limits: 512Mi RAM, 500m CPU
+
+Driver Service:
+- Requests: 512Mi RAM, 500m CPU
+- Limits: 1Gi RAM, 1000m CPU
+
+Frontend:
+- Requests: 256Mi RAM, 250m CPU
+- Limits: 512Mi RAM, 500m CPU
+
+Databases (each):
+- Requests: 256Mi RAM, 250m CPU
+- Limits: 512Mi RAM, 500m CPU
+
+Keycloak:
+- Requests: 512Mi RAM, 500m CPU
+- Limits: 1Gi RAM, 1000m CPU
+
+AUTO-SCALING
+------------
+
+All services have HPA configured:
+- Min replicas: 2
+- Max replicas: 10
+- CPU threshold: 70%
+- Memory threshold: 80%
+
+HEALTH CHECKS
+-------------
+
+All services have:
+- Liveness Probe: Detects crashed containers
+- Readiness Probe: Controls traffic routing
+- Startup Probe: Handles slow starts
+
+SECURITY
+--------
+
+✓ Non-root containers (where possible)
+✓ Read-only root filesystem capability
+✓ No privilege escalation
+✓ Capabilities dropped
+✓ Istio mTLS between services
+✓ Service accounts per service
+✓ Network policies (via Istio)
+
+TYPICAL DEPLOYMENT WORKFLOW
+---------------------------
+
+1. LOCAL: Build all images
+   ./docker-build.sh (in each service directory)
+
+2. LOCAL: Push to Docker Hub
+   ./docker-publish.sh (in each service directory)
+
+3. CLOUD: Deploy infrastructure
+   cd infrastructure/ansible/k8s
+   ./redeploy-all-services.sh
+
+4. CLOUD: Verify deployment
+   kubectl get pods -n fleet-management
+   kubectl get svc -n fleet-management
+
+5. CLOUD: Check logs
+   kubectl logs -f deployment/<service-name> -n fleet-management
+
+UPDATING A SERVICE
+------------------
+
+1. Make code changes
+2. Build new image: ./docker-build.sh
+3. Push to Docker Hub: ./docker-publish.sh
+4. Redeploy: cd k8s && ./redeploy-service.sh
+
+The deployment will:
+- Pull latest image (imagePullPolicy: Always)
+- Perform rolling update (zero downtime)
+- Wait for new pods to be ready
+- Terminate old pods
+
+TROUBLESHOOTING
+---------------
+
+Pods not starting:
+→ kubectl describe pod <pod-name> -n fleet-management
+→ kubectl logs <pod-name> -n fleet-management
+
+Image pull errors:
+→ Verify image exists: docker pull harinejan/<service>:latest
+→ Check imagePullPolicy in deployment.yaml
+
+Database connection errors:
+→ Check database pods: kubectl get pods -n fleet-management | grep postgres
+→ Verify connection strings in configmap.yaml
+
+Service not accessible:
+→ Check service: kubectl get svc <service-name> -n fleet-management
+→ Check Istio: kubectl get virtualservice -n fleet-management
+
+Istio issues:
+→ Check sidecar injection: kubectl get pods -n fleet-management -o jsonpath='{.items[*].spec.containers[*].name}'
+→ Should see: <service-name> istio-proxy
+
+CLEANUP
+-------
+
+# Delete all services
+kubectl delete namespace fleet-management
+
+# Or delete individually
+kubectl delete -k src/vehicleService/k8s/
+kubectl delete -k src/maintenanceService/k8s/
+kubectl delete -k src/DriverService/k8s/
+kubectl delete -k fleet-management-app/k8s/
+kubectl delete -f infrastructure/data/k8s/
+kubectl delete -f infrastructure/identity/k8s/
+
+PRODUCTION CHECKLIST
+--------------------
+
+[x] All services containerized
+[x] Docker images pushed to registry
+[x] Kubernetes manifests created
+[x] Istio service mesh configured
+[x] Prometheus monitoring configured
+[x] Health checks configured
+[x] Auto-scaling (HPA) configured
+[x] Resource limits set
+[x] Security contexts configured
+[x] Persistent storage for databases
+[ ] Change default passwords
+[ ] Configure TLS certificates
+[ ] Set up ingress gateway
+[ ] Configure backup strategy
+[ ] Set up logging (ELK/Loki)
+[ ] Configure alerting
+[ ] Load testing
+[ ] Disaster recovery plan
+
+USEFUL COMMANDS
+---------------
+
+# Scale manually
+kubectl scale deployment <service-name> --replicas=5 -n fleet-management
+
+# Restart deployment
+kubectl rollout restart deployment/<service-name> -n fleet-management
+
+# View rollout status
+kubectl rollout status deployment/<service-name> -n fleet-management
+
+# Rollback deployment
+kubectl rollout undo deployment/<service-name> -n fleet-management
+
+# Port forward for local access
+kubectl port-forward svc/<service-name> <local-port>:<service-port> -n fleet-management
+
+# Execute command in pod
+kubectl exec -it <pod-name> -n fleet-management -- /bin/sh
+
+# View events
+kubectl get events -n fleet-management --sort-by='.lastTimestamp'
+
+# Check resource usage
+kubectl top pods -n fleet-management
+kubectl top nodes
+
+SUPPORT
+-------
+
+For issues or questions:
+1. Check logs: kubectl logs -f deployment/<service-name> -n fleet-management
+2. Check events: kubectl get events -n fleet-management
+3. Describe resources: kubectl describe <resource> <name> -n fleet-management
+4. Check Istio: istioctl analyze -n fleet-management
+

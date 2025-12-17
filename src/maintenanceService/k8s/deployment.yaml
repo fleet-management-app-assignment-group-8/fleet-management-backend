@@ -1,0 +1,124 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: maintenance-service
+  namespace: fleet-management
+  labels:
+    app: maintenance-service
+    version: v1
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: maintenance-service
+      version: v1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: maintenance-service
+        version: v1
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "5001"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: maintenance-service
+      securityContext:
+        runAsNonRoot: false
+        fsGroup: 0
+      containers:
+      - name: maintenance-service
+        image: harinejan/maintenance-service:latest
+        imagePullPolicy: Always
+        ports:
+        - name: http
+          containerPort: 5001
+          protocol: TCP
+        env:
+        - name: FLASK_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: maintenance-service-config
+              key: FLASK_ENV
+        - name: FLASK_APP
+          valueFrom:
+            configMapKeyRef:
+              name: maintenance-service-config
+              key: FLASK_APP
+        - name: PORT
+          valueFrom:
+            configMapKeyRef:
+              name: maintenance-service-config
+              key: PORT
+        - name: HOST
+          valueFrom:
+            configMapKeyRef:
+              name: maintenance-service-config
+              key: HOST
+        - name: DATABASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: maintenance-service-config
+              key: DATABASE_URL
+        - name: CORS_ORIGINS
+          valueFrom:
+            configMapKeyRef:
+              name: maintenance-service-config
+              key: CORS_ORIGINS
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          successThreshold: 1
+          failureThreshold: 3
+        startupProbe:
+          httpGet:
+            path: /health
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 0
+          periodSeconds: 5
+          timeoutSeconds: 3
+          successThreshold: 1
+          failureThreshold: 12
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          capabilities:
+            drop:
+            - ALL
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: maintenance-service
+  namespace: fleet-management
+  labels:
+    app: maintenance-service
+

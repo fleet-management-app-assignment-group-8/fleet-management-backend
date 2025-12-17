@@ -1,0 +1,12 @@
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: maintenance-service
+  namespace: fleet-management
+spec:
+  selector:
+    matchLabels:
+      app: maintenance-service
+  mtls:
+    mode: STRICT
+

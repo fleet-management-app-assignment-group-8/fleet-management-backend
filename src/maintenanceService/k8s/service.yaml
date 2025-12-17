@@ -1,17 +1,18 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: driver-service
+  name: maintenance-service
   namespace: fleet-management
   labels:
-    app: driver-service
-    service: driver-service
+    app: maintenance-service
+    service: maintenance-service
 spec:
   type: ClusterIP
   ports:
-  - port: 8080
+  - port: 5001
     targetPort: http
     protocol: TCP
     name: http
   selector:
-    app: driver-service
+    app: maintenance-service
+

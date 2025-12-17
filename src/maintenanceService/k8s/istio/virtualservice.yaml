@@ -1,0 +1,24 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: maintenance-service
+  namespace: fleet-management
+spec:
+  hosts:
+  - maintenance-service
+  - maintenance-service.fleet-management.svc.cluster.local
+  http:
+  - match:
+    - uri:
+        prefix: "/"
+    route:
+    - destination:
+        host: maintenance-service
+        port:
+          number: 5001
+    timeout: 30s
+    retries:
+      attempts: 3
+      perTryTimeout: 10s
+      retryOn: 5xx,reset,connect-failure,refused-stream
+

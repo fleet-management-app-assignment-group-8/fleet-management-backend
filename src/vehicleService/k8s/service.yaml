@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: driver-service
+  name: vehicle-service
   namespace: fleet-management
   labels:
-    app: driver-service
-    service: driver-service
+    app: vehicle-service
+    service: vehicle-service
 spec:
   type: ClusterIP
   ports:
@@ -14,4 +14,5 @@ spec:
     protocol: TCP
     name: http
   selector:
-    app: driver-service
+    app: vehicle-service
+
