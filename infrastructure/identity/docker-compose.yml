@@ -43,12 +43,12 @@ services:
       KC_DB_PASSWORD: keycloak_password
       KC_DB_SCHEMA: public
 
-      # Hostname & Proxy Configuration (Production Mode)
-      # In production, this should be your actual domain (e.g., auth.fleet.com)
-      # For local "production-like" setup, we use localhost but enable HTTP
-      KC_HOSTNAME: localhost
+      # Hostname & Proxy Configuration (Local Development Mode)
+      # Removed KC_HOSTNAME to allow backend services to connect
+      # In production, set KC_HOSTNAME to your domain (e.g., auth.fleet.com)
       KC_HOSTNAME_STRICT: "false"
       KC_HOSTNAME_STRICT_HTTPS: "false"
+      KC_HOSTNAME_STRICT_BACKCHANNEL: "false"
       KC_HTTP_ENABLED: "true"
       KC_PROXY: edge 
 

@@ -38,8 +38,8 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/**").hasRole("fleet-admin")
                 .requestMatchers(HttpMethod.PUT, "/api/**").hasRole("fleet-admin")
                 
-                // Read actions allowed for everyone
-                .requestMatchers(HttpMethod.GET, "/api/**").authenticated() // Require valid JWT for reads
+                // Read actions allowed for everyone authenticated
+                .requestMatchers(HttpMethod.GET, "/api/**").authenticated()
                 
                 .anyRequest().authenticated()
             )
