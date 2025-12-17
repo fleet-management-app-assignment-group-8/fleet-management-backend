@@ -1,5 +1,6 @@
 package com.fleetops.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -35,6 +36,7 @@ public class DriverEntity {
     
     @Column(name = "expiry_date", nullable = false)
     @Temporal(TemporalType.DATE)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date expiryDate;
     
     @Column(name = "created_at", nullable = false, updatable = false)

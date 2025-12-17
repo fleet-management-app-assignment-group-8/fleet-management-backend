@@ -1,5 +1,6 @@
 package com.fleetops.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,6 +18,7 @@ public class Driver {
     private String email;
     private String phone;
     private String licenseNumber;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date expiryDate;
     private Double starRating;
     private Integer tripCount;

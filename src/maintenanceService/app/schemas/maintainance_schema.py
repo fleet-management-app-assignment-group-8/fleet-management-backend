@@ -45,7 +45,7 @@ class MaintenanceItemCreateSchema(Schema):
     assigned_to = fields.Str()
     assigned_technician = fields.Str()
     notes = fields.Str()
-    parts_needed = fields.List(fields.Dict())
+    parts_needed = fields.Raw()
 
 class MaintenanceItemUpdateSchema(Schema):
     type = fields.Str(validate=validate.Length(min=1, max=100))
@@ -66,8 +66,8 @@ class MaintenanceItemUpdateSchema(Schema):
     assigned_to = fields.Str()
     assigned_technician = fields.Str()
     notes = fields.Str()
-    parts_needed = fields.List(fields.Dict())
-    attachments = fields.List(fields.Dict())
+    parts_needed = fields.Raw()
+    attachments = fields.Raw()
 
 # Technician Schemas
 class TechnicianSchema(Schema):

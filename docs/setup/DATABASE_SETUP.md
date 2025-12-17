@@ -97,11 +97,6 @@ Container Startup
 
 ### Sample Data (3 Vehicles + Related Data)
 
-- **VH-001:** Ford Transit Van (Active, 45,200 mi)
-- **VH-002:** Tesla Model S (Active, 13,200 mi)
-- **VH-003:** Toyota Hilux (Maintenance, 88,800 mi)
-- Plus: 3 status histories, 2 maintenance records
-
 ### Docker Compose Features
 
 ```yaml

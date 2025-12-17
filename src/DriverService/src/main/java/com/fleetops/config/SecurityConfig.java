@@ -26,8 +26,10 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+            .cors(org.springframework.security.config.Customizer.withDefaults()) // Enable CORS in Security
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Explicitly allow OPTIONS requests
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll() // Allow Swagger
                 .requestMatchers("/actuator/health/**", "/health").permitAll() // Allow Health checks
                 
@@ -37,7 +39,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.PUT, "/api/**").hasRole("fleet-admin")
                 
                 // Read actions allowed for everyone
-                .requestMatchers(HttpMethod.GET, "/api/**").authenticated()
+                .requestMatchers(HttpMethod.GET, "/api/**").authenticated() // Require valid JWT for reads
                 
                 .anyRequest().authenticated()
             )

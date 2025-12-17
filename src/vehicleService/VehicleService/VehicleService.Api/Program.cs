@@ -92,6 +92,11 @@ builder.Services.AddAuthentication("Bearer")
         {
             ValidateAudience = false, // Allow if audience is not strictly set in token
             ValidateIssuer = true,
+            // Accept both localhost and 127.0.0.1 as valid issuers
+            ValidIssuers = new[] { 
+                "http://127.0.0.1:8080/realms/fleet-management-app",
+                "http://localhost:8080/realms/fleet-management-app"
+            },
             ValidateLifetime = true,
         };
         

@@ -54,8 +54,8 @@ public class DataSeeder implements CommandLineRunner {
                     driverRepository.saveAll(drivers);
                     logger.info("✅ Seeded {} drivers.", drivers.size());
                 }
-            } catch (IOException e) {
-                logger.error("❌ Failed to seed drivers: {}", e.getMessage());
+            } catch (Exception e) {
+                logger.error("❌ Failed to seed drivers: {}", e.getMessage(), e);
             }
         } else {
             logger.info("ℹ️  Drivers table already populated. Skipping seed.");
