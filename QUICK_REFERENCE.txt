@@ -71,3 +71,4 @@ CLEANUP
 -------
 kubectl delete namespace fleet-management
 
+

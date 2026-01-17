@@ -10,3 +10,4 @@ data:
   # Database connection (uses postgres-vehicle service)
   ConnectionStrings__DefaultConnection: "Host=postgres-vehicle;Port=5432;Database=vehicle_db;Username=postgres;Password=postgres"
 
+

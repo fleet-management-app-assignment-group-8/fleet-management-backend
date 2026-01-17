@@ -12,3 +12,4 @@ data:
   # Database connection (uses postgres-maintenance service)
   DATABASE_URL: "postgresql://postgres:postgres@postgres-maintenance:5432/maintenance_db"
 
+

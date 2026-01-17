@@ -60,3 +60,4 @@ echo -e "${GREEN}Publish Complete!${NC}"
 echo "Docker Hub: https://hub.docker.com/r/${DOCKER_HUB_USERNAME}/${IMAGE_NAME}"
 echo ""
 
+
